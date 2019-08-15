@@ -19,6 +19,7 @@ package org.ros.node;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Executes {@link NodeMain}s and allows shutting down individual
@@ -75,6 +76,13 @@ public interface NodeMainExecutor {
    *          the {@link NodeMain} to shutdown
    */
   void shutdownNodeMain(NodeMain nodeMain);
+
+  /**
+   * See {@link #shutdown()}; this method specifies a maximum delay to shutdown each node.
+   * @param maxDelayDuration Maximum delay duration when shutting down each node.
+   * @param maxDelayUnit Maximum delay unit.
+   */
+  void shutdown(int maxDelayDuration, TimeUnit maxDelayUnit);
 
   /**
    * Shutdown all started {@link Node}s. This does not shut down the supplied

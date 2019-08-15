@@ -93,7 +93,7 @@ public class DefaultNode implements ConnectedNode {
    * {@link NodeListener}s have not yet returned from their
    * {@link NodeListener#onShutdown(Node)} callback.
    */
-  private static final int MAX_SHUTDOWN_DELAY_DURATION = 5;
+  private static final int MAX_SHUTDOWN_DELAY_DURATION = 1;
   private static final TimeUnit MAX_SHUTDOWN_DELAY_UNITS = TimeUnit.SECONDS;
 
   private final NodeConfiguration nodeConfiguration;
@@ -423,7 +423,12 @@ public class DefaultNode implements ConnectedNode {
 
   @Override
   public void shutdown() {
-    signalOnShutdown();
+    shutdown(MAX_SHUTDOWN_DELAY_DURATION, MAX_SHUTDOWN_DELAY_UNITS);
+  }
+
+  @Override
+  public void shutdown(int maxDelayDuration, TimeUnit maxDelayUnit) {
+    signalOnShutdown(maxDelayDuration, maxDelayUnit);
     // NOTE(damonkohler): We don't want to raise potentially spurious
     // exceptions during shutdown that would interrupt the process. This is
     // simply best effort cleanup.
@@ -446,8 +451,8 @@ public class DefaultNode implements ConnectedNode {
       serviceClient.shutdown();
     }
     slaveServer.shutdown();
-    topicParticipantManager.shutdown();
-    registrar.shutdown();
+    topicParticipantManager.shutdown(maxDelayDuration, maxDelayUnit);
+    registrar.shutdown(maxDelayDuration, maxDelayUnit);
     signalOnShutdownComplete();
   }
 
@@ -538,7 +543,7 @@ public class DefaultNode implements ConnectedNode {
    * <p>
    * Each listener is called in a separate thread.
    */
-  private void signalOnShutdown() {
+  private void signalOnShutdown(int maxDelayDuration, TimeUnit maxDelayUnit) {
     final Node node = this;
     try {
       nodeListeners.signal(new SignalRunnable<NodeListener>() {
@@ -546,7 +551,7 @@ public class DefaultNode implements ConnectedNode {
         public void run(NodeListener listener) {
           listener.onShutdown(node);
         }
-      }, MAX_SHUTDOWN_DELAY_DURATION, MAX_SHUTDOWN_DELAY_UNITS);
+      }, maxDelayDuration, maxDelayUnit);
     } catch (InterruptedException e) {
       // Ignored since we do not guarantee that all listeners will finish
       // before

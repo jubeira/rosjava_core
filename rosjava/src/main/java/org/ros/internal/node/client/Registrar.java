@@ -53,7 +53,7 @@ public class Registrar implements TopicParticipantManagerListener, ServiceManage
   private static final boolean DEBUG = true;
   private static final Log log = LogFactory.getLog(Registrar.class);
 
-  private static final int SHUTDOWN_TIMEOUT = 5;
+  private static final int SHUTDOWN_TIMEOUT = 1;
   private static final TimeUnit SHUTDOWN_TIMEOUT_UNITS = TimeUnit.SECONDS;
 
   private final MasterClient masterClient;
@@ -336,6 +336,10 @@ public class Registrar implements TopicParticipantManagerListener, ServiceManage
     running = true;
   }
 
+  public void shutdown() {
+    shutdown(SHUTDOWN_TIMEOUT, SHUTDOWN_TIMEOUT_UNITS);
+  }
+
   /**
    * Shuts down the {@link Registrar}.
    * 
@@ -347,13 +351,13 @@ public class Registrar implements TopicParticipantManagerListener, ServiceManage
    * <p>
    * Calling {@link #shutdown()} more than once has no effect.
    */
-  public void shutdown() {
+  public void shutdown(int shutdownTimeout, TimeUnit timeUnit) {
     if (!running) {
       return;
     }
     running = false;
     try {
-      retryingExecutorService.shutdown(SHUTDOWN_TIMEOUT, SHUTDOWN_TIMEOUT_UNITS);
+      retryingExecutorService.shutdown(shutdownTimeout, timeUnit);
     } catch (InterruptedException e) {
       throw new RosRuntimeException(e);
     }

@@ -47,7 +47,7 @@ public class TcpClient {
   private static final boolean DEBUG = false;
   private static final Log log = LogFactory.getLog(TcpClient.class);
 
-  private static final int DEFAULT_CONNECTION_TIMEOUT_DURATION = 5;
+  private static final int DEFAULT_CONNECTION_TIMEOUT_DURATION = 1;
   private static final TimeUnit DEFAULT_CONNECTION_TIMEOUT_UNIT = TimeUnit.SECONDS;
   private static final boolean DEFAULT_KEEP_ALIVE = true;
 

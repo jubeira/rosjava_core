@@ -45,7 +45,7 @@ public class RetryingExecutorService {
   private static final boolean DEBUG = false;
   private static final Log log = LogFactory.getLog(RetryingExecutorService.class);
 
-  private static final long DEFAULT_RETRY_DELAY = 5;
+  private static final long DEFAULT_RETRY_DELAY = 1;
   private static final TimeUnit DEFAULT_RETRY_TIME_UNIT = TimeUnit.SECONDS;
 
   private final ScheduledExecutorService scheduledExecutorService;

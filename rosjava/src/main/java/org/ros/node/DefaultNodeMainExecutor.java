@@ -33,6 +33,7 @@ import org.ros.namespace.GraphName;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Executes {@link NodeMain}s in separate threads.
@@ -43,6 +44,8 @@ public class DefaultNodeMainExecutor implements NodeMainExecutor {
 
   private static final boolean DEBUG = false;
   private static final Log log = LogFactory.getLog(DefaultNodeMainExecutor.class);
+  private static final int MAX_SHUTDOWN_DELAY_DURATION = 1;
+  private static final TimeUnit MAX_SHUTDOWN_DELAY_UNITS = TimeUnit.SECONDS;
 
   private final NodeFactory nodeFactory;
   private final ScheduledExecutorService scheduledExecutorService;
@@ -151,17 +154,22 @@ public class DefaultNodeMainExecutor implements NodeMainExecutor {
   public void shutdownNodeMain(NodeMain nodeMain) {
     Node node = nodeMains.inverse().get(nodeMain);
     if (node != null) {
-      safelyShutdownNode(node);
+      safelyShutdownNode(node, MAX_SHUTDOWN_DELAY_DURATION, MAX_SHUTDOWN_DELAY_UNITS);
+    }
+  }
+
+  @Override
+  public void shutdown(int maxDelayDuration, TimeUnit maxDelayUnit) {
+    synchronized (connectedNodes) {
+      for (ConnectedNode connectedNode : connectedNodes.values()) {
+        safelyShutdownNode(connectedNode, maxDelayDuration, maxDelayUnit);
+      }
     }
   }
 
   @Override
   public void shutdown() {
-    synchronized (connectedNodes) {
-      for (ConnectedNode connectedNode : connectedNodes.values()) {
-        safelyShutdownNode(connectedNode);
-      }
-    }
+    shutdown(MAX_SHUTDOWN_DELAY_DURATION, MAX_SHUTDOWN_DELAY_UNITS);
   }
 
   /**
@@ -170,10 +178,10 @@ public class DefaultNodeMainExecutor implements NodeMainExecutor {
    * @param node
    *          the {@link Node} to shut down
    */
-  private void safelyShutdownNode(Node node) {
+  private void safelyShutdownNode(Node node, int maxDelayDuration, TimeUnit maxDelayUnit) {
     boolean success = true;
     try {
-      node.shutdown();
+      node.shutdown(maxDelayDuration, maxDelayUnit);
     } catch (Exception e) {
       // Ignore spurious errors during shutdown.
       log.error("Exception thrown while shutting down node.", e);

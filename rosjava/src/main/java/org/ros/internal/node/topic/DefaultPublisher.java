@@ -54,7 +54,7 @@ public class DefaultPublisher<T> extends DefaultTopicParticipant implements Publ
    * {@link PublisherListener}s have not yet returned from their
    * {@link PublisherListener#onShutdown(Publisher)} callback.
    */
-  private static final long DEFAULT_SHUTDOWN_TIMEOUT = 5;
+  private static final long DEFAULT_SHUTDOWN_TIMEOUT = 1;
   private static final TimeUnit DEFAULT_SHUTDOWN_TIMEOUT_UNITS = TimeUnit.SECONDS;
 
   /**

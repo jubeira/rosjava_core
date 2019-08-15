@@ -25,8 +25,10 @@ import org.ros.namespace.GraphName;
 import org.ros.node.topic.Publisher;
 import org.ros.node.topic.Subscriber;
 
+import java.sql.Time;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Manages a collection of {@link Publisher}s and {@link Subscriber}s.
@@ -136,14 +138,14 @@ public class TopicParticipantManager {
     publisherConnections.remove(publisher, subscriberIdentifier);
   }
 
-  public void shutdown(){
+  public void shutdown(int maxDelayDuration, TimeUnit maxDelayUnit) {
     for(DefaultPublisher<?> publisher : publishers.values()){
-      publisher.shutdown();
+      publisher.shutdown(maxDelayDuration, maxDelayUnit);
       removePublisher(publisher);
     }
     subscriberConnections.clear();
     for(DefaultSubscriber<?> subscriber : subscribers.values()){
-      subscriber.shutdown();
+      subscriber.shutdown(maxDelayDuration, maxDelayUnit);
       removeSubscriber(subscriber);
     }
     publisherConnections.clear();

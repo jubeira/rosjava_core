@@ -54,7 +54,7 @@ public class DefaultSubscriber<T> extends DefaultTopicParticipant implements Sub
    * {@link SubscriberListener}s have not yet returned from their
    * {@link SubscriberListener#onShutdown(Subscriber)} callback.
    */
-  private static final int DEFAULT_SHUTDOWN_TIMEOUT = 5;
+  private static final int DEFAULT_SHUTDOWN_TIMEOUT = 1;
   private static final TimeUnit DEFAULT_SHUTDOWN_TIMEOUT_UNITS = TimeUnit.SECONDS;
 
   private final NodeIdentifier nodeIdentifier;

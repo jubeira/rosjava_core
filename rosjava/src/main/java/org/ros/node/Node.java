@@ -26,6 +26,7 @@ import org.ros.namespace.NodeNameResolver;
 
 import java.net.URI;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A node in the ROS graph.
@@ -121,6 +122,11 @@ public interface Node {
    *          the {@link CancellableLoop} to execute
    */
   void executeCancellableLoop(CancellableLoop cancellableLoop);
+
+  /**
+   * Shut the node down specifying a maximum timeout.
+   */
+  void shutdown(int maxDelayDuration, TimeUnit maxDelayUnit);
 
   /**
    * Shut the node down.
